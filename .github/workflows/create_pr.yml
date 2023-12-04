@@ -15,6 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create 'releases' label
+        run: gh api repos/:owner/:repo/labels --field name=releases --field color=ff0000 --field description="For releases" --method POST
+
+
       - name: Create Pull Request
         if: startsWith(github.ref, 'refs/heads/public-') && github.event_name == 'push'
         id: create-pr        
@@ -27,11 +31,9 @@ jobs:
           # Replace 'main' with your base branch name
           gh pr create --base main --head $BRANCH_NAME --title "Pull request title for $BRANCH_NAME" --body "new release for $BRANCH_NAME"
 
- 
+
       - name: Add 'releases' label to the PR
         if: steps.create-pr.outcome == 'success'
         run: |
-          gh label create release --description "releasing a new version" --color E99695
           PR_NUMBER=$(echo "${{ steps.create-pr.outputs.stdout }}" | awk '{print $4}')
-          echo "$PR_NUMBER"
           gh pr edit $PR_NUMBER --add-label releases
