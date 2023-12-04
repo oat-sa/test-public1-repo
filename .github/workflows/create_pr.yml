@@ -32,4 +32,5 @@ jobs:
         if: steps.create-pr.outcome == 'success'
         run: |
           PR_NUMBER=$(echo "${{ steps.create-pr.outputs.stdout }}" | awk '{print $4}')
+          echo "$PR_NUMBER"
           gh pr edit $PR_NUMBER --add-label releases
